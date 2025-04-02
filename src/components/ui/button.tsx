@@ -19,11 +19,21 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary font-semibold underline-offset-4 hover:underline", // Added font-semibold for better visibility
+        
+        // New variants
+        primary: "bg-health-bright-blue text-white hover:bg-health-deep-blue",
+        primaryOutline: "border-2 border-health-bright-blue text-health-bright-blue bg-transparent hover:bg-health-bright-blue/10",
+        teal: "bg-health-teal text-white hover:bg-health-teal/90",
+        success: "bg-health-lime text-white hover:bg-health-lime/90",
+        warning: "bg-health-orange text-white hover:bg-health-orange/90",
+        danger: "bg-health-red text-white hover:bg-health-red/90",
+        glass: "bg-white/20 backdrop-blur-sm border border-white/30 text-primary hover:bg-white/30",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
+        xl: "h-12 rounded-md px-10 text-base",
         icon: "h-10 w-10",
       },
     },

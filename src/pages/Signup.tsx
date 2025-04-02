@@ -13,7 +13,9 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Github, Mail } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { FcGoogle } from 'react-icons/fc';
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -93,12 +95,56 @@ const Signup = () => {
     }
   };
 
+  const handleSocialSignup = (provider: string) => {
+    setLoading(true);
+    
+    try {
+      // In a real app, we would integrate with the provider's auth SDK
+      toast.success(`Signup with ${provider} successful!`);
+      signup('User from ' + provider, 'user@' + provider.toLowerCase() + '.com', 'social-signup-token', role);
+      navigate('/dashboard');
+    } catch (error) {
+      toast.error(`Signup with ${provider} failed. Please try again.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-[calc(100vh-60px)] flex items-center justify-center bg-signup-bg bg-cover">
+    <div className="min-h-[calc(100vh-60px)] flex items-center justify-center bg-signup-bg bg-cover py-10">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg animate-fade-in">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-health-deep-blue">Create Account</h2>
           <p className="mt-2 text-gray-600">Join Health Insight Nexus today</p>
+        </div>
+        
+        <div className="flex flex-col gap-4">
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center justify-center gap-2 h-12 border-2"
+            onClick={() => handleSocialSignup('Google')}
+            disabled={loading}
+          >
+            <FcGoogle size={20} />
+            <span>Sign up with Google</span>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center justify-center gap-2 h-12 border-2 bg-black text-white hover:bg-gray-800"
+            onClick={() => handleSocialSignup('GitHub')}
+            disabled={loading}
+          >
+            <Github size={20} />
+            <span>Sign up with GitHub</span>
+          </Button>
+          
+          <div className="relative my-2">
+            <Separator />
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 text-xs text-gray-500">
+              OR
+            </span>
+          </div>
         </div>
         
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -117,15 +163,18 @@ const Signup = () => {
           
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input-field mt-1"
-              placeholder="you@example.com"
-              required
-            />
+            <div className="relative mt-1">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-10 input-field"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
           </div>
           
           <div>
@@ -200,7 +249,7 @@ const Signup = () => {
           
           <Button
             type="submit"
-            className="w-full mt-6 bg-health-bright-blue hover:bg-health-deep-blue transition-colors"
+            className="w-full mt-6 bg-health-bright-blue hover:bg-health-deep-blue transition-colors h-12"
             disabled={loading}
           >
             {loading ? 'Creating Account...' : 'Create Account'}

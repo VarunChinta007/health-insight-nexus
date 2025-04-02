@@ -1,6 +1,15 @@
 
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart4, FileText, Home, PieChart, Stethoscope, User } from 'lucide-react';
+import { 
+  BarChart4, 
+  FileText, 
+  Home, 
+  PieChart, 
+  Stethoscope, 
+  User,
+  Heart,
+  Info
+} from 'lucide-react';
 import { useAppStore } from '@/store';
 import { cn } from '@/lib/utils';
 
@@ -39,10 +48,20 @@ const Sidebar = () => {
       name: 'Analysis',
       path: '/analysis',
     },
+    {
+      icon: Heart,
+      name: 'Health Tips',
+      path: '/health-tips',
+    },
+    {
+      icon: Info,
+      name: 'About Us',
+      path: '/about',
+    },
   ];
 
   return (
-    <aside className="w-[250px] fixed left-0 top-[60px] h-[calc(100vh-60px)] bg-sidebar border-r border-gray-200 py-6 px-4 flex flex-col z-40">
+    <aside className="w-[250px] fixed left-0 top-[60px] h-[calc(100vh-60px)] bg-sidebar border-r border-gray-200 py-6 px-4 flex flex-col z-40 overflow-y-auto">
       <div className="flex-1">
         {user?.role && (
           <div className="mb-6 px-2">
