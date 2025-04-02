@@ -1,370 +1,190 @@
 
-import { useState } from 'react';
+import React from 'react';
 import { useAppStore } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Download,
-  FileText, 
-  Filter, 
-  Search, 
-  Upload,
-  Calendar, 
-  Prescription, 
-  FlaskConical, 
-  Activity, 
-  Stethoscope
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { MedicalRecord } from '@/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FileText, FilePlus, Clock, Download, ClipboardList } from 'lucide-react'; // Changed Prescription to ClipboardList
 
 const EHR = () => {
-  const { user, medicalRecords } = useAppStore();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<string | null>(null);
-
-  const filteredRecords = medicalRecords.filter(record => {
-    const matchesSearch = !searchTerm || 
-      record.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.doctorName.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    const matchesFilter = !filterType || record.type === filterType;
-    
-    return matchesSearch && matchesFilter;
-  });
-
-  const handleDownload = (record: MedicalRecord) => {
-    toast.success(`Record "${record.title}" downloaded successfully`);
-  };
-
-  const handleFilterClear = () => {
-    setFilterType(null);
-    setSearchTerm('');
-  };
-  
-  // Group records by year and month
-  const groupedRecords = filteredRecords.reduce((groups, record) => {
-    const date = new Date(record.date);
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    
-    if (!groups[year]) {
-      groups[year] = {};
-    }
-    
-    if (!groups[year][month]) {
-      groups[year][month] = [];
-    }
-    
-    groups[year][month].push(record);
-    return groups;
-  }, {} as Record<number, Record<number, MedicalRecord[]>>);
-  
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const recordTypeIcons = {
-    prescription: <Prescription size={16} />,
-    lab: <FlaskConical size={16} />,
-    imaging: <Activity size={16} />,
-    visit: <Stethoscope size={16} />,
-    surgery: <Calendar size={16} />,
-    other: <FileText size={16} />
-  };
+  const { user } = useAppStore();
 
   return (
-    <div className="bg-ehr-bg bg-cover">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-health-deep-blue animate-fade-in">
-          Electronic Health Records
-        </h1>
-        
-        <Button className="btn-primary">
-          <Upload size={16} className="mr-2" />
-          Upload Document
-        </Button>
+    <div className="flex flex-col gap-6 fade-in-animation">
+      <h1 className="text-2xl font-bold">Electronic Health Records</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="col-span-1 card-hover">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center">
+              <FileText className="mr-2 text-health-bright-blue" size={20} />
+              Medical Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Your essential medical information at a glance.
+            </p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="font-medium">Blood Group:</span>
+                <span>O Positive</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Allergies:</span>
+                <span>Penicillin, Peanuts</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Chronic Conditions:</span>
+                <span>None</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2 card-hover">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center">
+              <ClipboardList className="mr-2 text-health-bright-blue" size={20} />
+              Recent Prescriptions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-3 border rounded-lg flex justify-between items-center">
+                <div>
+                  <p className="font-medium">Antibiotics Course</p>
+                  <p className="text-sm text-muted-foreground">Dr. Sarah Johnson - June 15, 2023</p>
+                </div>
+                <Button size="sm" variant="outline" className="flex items-center">
+                  <Download size={16} className="mr-1" /> PDF
+                </Button>
+              </div>
+              
+              <div className="p-3 border rounded-lg flex justify-between items-center">
+                <div>
+                  <p className="font-medium">Vitamin D Supplements</p>
+                  <p className="text-sm text-muted-foreground">Dr. Michael Chen - May 22, 2023</p>
+                </div>
+                <Button size="sm" variant="outline" className="flex items-center">
+                  <Download size={16} className="mr-1" /> PDF
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <Card className="glass-card mb-8">
-        <CardHeader className="pb-2">
-          <CardTitle>Patient Overview</CardTitle>
+      <Card className="card-hover">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <FilePlus className="mr-2 text-health-bright-blue" size={20} />
+            Medical Records
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Patient</p>
-              <p className="font-semibold">{user?.name}</p>
-              <p className="text-sm text-gray-500">ID: {user?.id}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Date of Birth</p>
-              <p className="font-semibold">{user?.age ? `Age ${user.age}` : 'N/A'}</p>
-              <p className="text-sm text-gray-500">Blood Group: {user?.bloodGroup || 'N/A'}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Allergies</p>
-              {user?.allergies && user.allergies.length > 0 ? (
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {user.allergies.map((allergy, index) => (
-                    <Badge key={index} variant="outline" className="bg-red-50 text-red-600 border-red-200 text-xs">
-                      {allergy}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <p className="font-semibold">No known allergies</p>
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Medical Conditions</p>
-              {user?.conditions && user.conditions.length > 0 ? (
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {user.conditions.map((condition, index) => (
-                    <Badge key={index} variant="outline" className="bg-yellow-50 text-yellow-600 border-yellow-200 text-xs">
-                      {condition}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <p className="font-semibold">No medical conditions</p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Tabs defaultValue="timeline">
-        <TabsList className="mb-6 bg-white/70 backdrop-blur-sm">
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="medications">Medications</TabsTrigger>
-          <TabsTrigger value="vitals">Vitals</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="timeline">
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="md:w-3/4">
-              <Card className="glass-card mb-6">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle>Medical Timeline</CardTitle>
-                  <div className="flex gap-2">
-                    {filterType && (
-                      <Badge variant="outline" className="bg-gray-100 gap-1 cursor-pointer" onClick={handleFilterClear}>
-                        {filterType}
-                        <span className="ml-1">✕</span>
-                      </Badge>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2 mb-6">
-                    <Search size={20} className="text-gray-400" />
-                    <Input
-                      placeholder="Search records..."
-                      value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button variant="outline" className="gap-2">
-                      <Filter size={16} />
-                      Filter
+          <Tabs defaultValue="visits">
+            <TabsList className="mb-4">
+              <TabsTrigger value="visits">Doctor Visits</TabsTrigger>
+              <TabsTrigger value="lab">Lab Results</TabsTrigger>
+              <TabsTrigger value="imaging">Imaging</TabsTrigger>
+              <TabsTrigger value="reports">Reports</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="visits">
+              <div className="space-y-4">
+                {[1, 2, 3].map((item) => (
+                  <div key={item} className="p-4 border rounded-lg">
+                    <div className="flex justify-between mb-2">
+                      <h4 className="font-medium">General Check-up</h4>
+                      <span className="text-sm text-muted-foreground flex items-center">
+                        <Clock size={14} className="mr-1" /> 
+                        May {10 - item}, 2023
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">Dr. Ryan Williams - Central Hospital</p>
+                    <p className="text-sm mb-3">Routine health examination. Blood pressure normal. Recommended regular exercise.</p>
+                    <Button variant="outline" size="sm" className="flex items-center text-sm">
+                      <FileText size={14} className="mr-1" /> View Details
                     </Button>
                   </div>
-
-                  {Object.keys(groupedRecords).length > 0 ? (
-                    <div className="space-y-8">
-                      {Object.keys(groupedRecords)
-                        .sort((a, b) => Number(b) - Number(a)) // Sort years descending
-                        .map(year => (
-                          <div key={year} className="space-y-4">
-                            <h3 className="text-xl font-bold text-health-deep-blue">{year}</h3>
-                            {Object.keys(groupedRecords[Number(year)])
-                              .sort((a, b) => Number(b) - Number(a)) // Sort months descending
-                              .map(month => (
-                                <div key={`${year}-${month}`} className="pl-6 border-l-2 border-gray-200">
-                                  <h4 className="text-lg font-medium text-gray-700 mb-3">
-                                    {monthNames[Number(month)]}
-                                  </h4>
-                                  <div className="space-y-4">
-                                    {groupedRecords[Number(year)][Number(month)].map((record) => (
-                                      <div 
-                                        key={record.id} 
-                                        className="p-4 rounded-lg border border-gray-200 bg-white hover:shadow-md transition-shadow duration-200"
-                                      >
-                                        <div className="flex flex-wrap justify-between gap-4">
-                                          <div>
-                                            <div className="flex items-center gap-2">
-                                              <Badge className={`
-                                                ${record.type === 'prescription' ? 'bg-purple-100 text-purple-600' : 
-                                                  record.type === 'lab' ? 'bg-blue-100 text-blue-600' :
-                                                  record.type === 'imaging' ? 'bg-indigo-100 text-indigo-600' :
-                                                  record.type === 'visit' ? 'bg-green-100 text-green-600' :
-                                                  record.type === 'surgery' ? 'bg-red-100 text-red-600' :
-                                                  'bg-gray-100 text-gray-600'}
-                                                flex items-center gap-1 capitalize cursor-pointer
-                                              `}
-                                                onClick={() => setFilterType(record.type)}
-                                              >
-                                                {record.type === 'prescription' ? recordTypeIcons.prescription :
-                                                 record.type === 'lab' ? recordTypeIcons.lab :
-                                                 record.type === 'imaging' ? recordTypeIcons.imaging :
-                                                 record.type === 'visit' ? recordTypeIcons.visit :
-                                                 record.type === 'surgery' ? recordTypeIcons.surgery :
-                                                 recordTypeIcons.other}
-                                                {record.type}
-                                              </Badge>
-                                              <span className="text-sm text-gray-500">{record.date}</span>
-                                            </div>
-                                            <h4 className="text-lg font-medium mt-1">{record.title}</h4>
-                                          </div>
-                                          
-                                          <div className="flex items-start gap-2">
-                                            <Button 
-                                              variant="outline" 
-                                              size="sm"
-                                              onClick={() => handleDownload(record)}
-                                              className="flex items-center gap-1"
-                                            >
-                                              <Download size={16} />
-                                              Download
-                                            </Button>
-                                          </div>
-                                        </div>
-                                        
-                                        <p className="text-gray-600 mt-2">{record.description}</p>
-                                        
-                                        {record.attachments && record.attachments.length > 0 && (
-                                          <div className="mt-3 pt-3 border-t border-gray-100">
-                                            <p className="text-sm text-gray-500 mb-2">Attachments:</p>
-                                            <div className="flex flex-wrap gap-2">
-                                              {record.attachments.map((attachment, index) => (
-                                                <div 
-                                                  key={index}
-                                                  className="p-2 bg-gray-50 rounded border border-gray-200 flex items-center gap-2 hover:bg-gray-100 cursor-pointer"
-                                                >
-                                                  <FileText size={16} className="text-health-bright-blue" />
-                                                  <span className="text-sm">
-                                                    {attachment.split('/').pop()}
-                                                  </span>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        )}
-                                        
-                                        <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-                                          <div className="text-sm text-gray-500">
-                                            Doctor: <span className="font-medium">{record.doctorName}</span>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              ))}
-                          </div>
-                        ))}
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="lab">
+              <div className="space-y-4">
+                {[1, 2].map((item) => (
+                  <div key={item} className="p-4 border rounded-lg">
+                    <div className="flex justify-between mb-2">
+                      <h4 className="font-medium">Complete Blood Count</h4>
+                      <span className="text-sm text-muted-foreground flex items-center">
+                        <Clock size={14} className="mr-1" /> 
+                        April {20 - item * 5}, 2023
+                      </span>
                     </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <FileText size={48} className="mx-auto text-gray-400 mb-4" />
-                      <h3 className="text-lg font-medium text-gray-800">No Records Found</h3>
-                      <p className="text-gray-500">
-                        {searchTerm || filterType ? 'No records match your search criteria' : 'No medical records available'}
-                      </p>
+                    <p className="text-sm text-muted-foreground mb-2">Central Hospital Laboratory</p>
+                    <p className="text-sm mb-3">All values within normal range. No anomalies detected.</p>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm" className="flex items-center text-sm">
+                        <FileText size={14} className="mr-1" /> View Details
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex items-center text-sm">
+                        <Download size={14} className="mr-1" /> Download
+                      </Button>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="md:w-1/4">
-              <Card className="glass-card sticky top-[84px]">
-                <CardHeader className="pb-2">
-                  <CardTitle>Filter by Type</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {['prescription', 'lab', 'imaging', 'visit', 'surgery', 'other'].map((type) => (
-                      <div
-                        key={type}
-                        className={`
-                          p-2 rounded-md flex items-center gap-2 cursor-pointer transition-colors
-                          ${filterType === type ? 'bg-health-bright-blue/10 border border-health-bright-blue/30' : 'hover:bg-gray-100'}
-                        `}
-                        onClick={() => setFilterType(filterType === type ? null : type)}
-                      >
-                        <div className={`
-                          w-8 h-8 rounded-full flex items-center justify-center
-                          ${type === 'prescription' ? 'bg-purple-100 text-purple-600' : 
-                            type === 'lab' ? 'bg-blue-100 text-blue-600' :
-                            type === 'imaging' ? 'bg-indigo-100 text-indigo-600' :
-                            type === 'visit' ? 'bg-green-100 text-green-600' :
-                            type === 'surgery' ? 'bg-red-100 text-red-600' :
-                            'bg-gray-100 text-gray-600'}
-                        `}>
-                          {type === 'prescription' ? <Prescription size={16} /> : 
-                           type === 'lab' ? <FlaskConical size={16} /> :
-                           type === 'imaging' ? <Activity size={16} /> :
-                           type === 'visit' ? <Stethoscope size={16} /> :
-                           type === 'surgery' ? <Calendar size={16} /> :
-                           <FileText size={16} />}
-                        </div>
-                        <span className="capitalize">{type}</span>
-                      </div>
-                    ))}
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="documents">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle>Medical Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-500">
-                This section will contain organized medical documents like test results, imaging studies, and discharge summaries.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="medications">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle>Medication History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-500">
-                This section will display current and past medications, dosage information, and prescription history.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="vitals">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle>Vital Signs History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-500">
-                This section will track vital signs over time with graphs and trends for blood pressure, heart rate, temperature, etc.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="imaging">
+              <div className="space-y-4">
+                <div className="p-4 border rounded-lg">
+                  <div className="flex justify-between mb-2">
+                    <h4 className="font-medium">Chest X-Ray</h4>
+                    <span className="text-sm text-muted-foreground flex items-center">
+                      <Clock size={14} className="mr-1" /> 
+                      March 15, 2023
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">Radiology Department, Central Hospital</p>
+                  <p className="text-sm mb-3">No abnormalities detected. Lungs clear.</p>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm" className="flex items-center text-sm">
+                      <FileText size={14} className="mr-1" /> View Image
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex items-center text-sm">
+                      <Download size={14} className="mr-1" /> Download
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="reports">
+              <div className="space-y-4">
+                {[1, 2].map((item) => (
+                  <div key={item} className="p-4 border rounded-lg">
+                    <div className="flex justify-between mb-2">
+                      <h4 className="font-medium">Annual Health Assessment</h4>
+                      <span className="text-sm text-muted-foreground flex items-center">
+                        <Clock size={14} className="mr-1" /> 
+                        February {10 - item * 5}, 2023
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">Dr. Julia Roberts - Wellness Clinic</p>
+                    <p className="text-sm mb-3">Overall health status is excellent. Recommended dietary changes included.</p>
+                    <Button variant="outline" size="sm" className="flex items-center text-sm">
+                      <Download size={14} className="mr-1" /> Download Report
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };
