@@ -8,7 +8,9 @@ import {
   Stethoscope, 
   User,
   Heart,
-  Info
+  Info,
+  Brain,
+  ActivitySquare
 } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { cn } from '@/lib/utils';
@@ -42,6 +44,11 @@ const Sidebar = () => {
       icon: Stethoscope,
       name: 'Diagnostics',
       path: '/diagnostics',
+    },
+    {
+      icon: ActivitySquare,
+      name: 'Health Insights',
+      path: '/health-insights',
     },
     {
       icon: PieChart,
